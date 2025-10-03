@@ -11,7 +11,6 @@ const createAuction = async (req, res) => {
 
     const auction = await repo.createAuction(req.body);
 
-    // Map _id to auctionId and car to carId
     const responseAuction = {
       auctionId: auction._id,
       carId: auction.car,

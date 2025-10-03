@@ -2,7 +2,10 @@ const jwt = require("jsonwebtoken");
 const ApiResponse = require("../utils/apiResponse");
 const messages = require("../constants/messages");
 
-const ADMIN_USER = { username: "Admin", password: "Admin" };
+const ADMIN_USER = {
+  username: process.env.ADMIN_USERNAME,
+  password: process.env.ADMIN_PASSWORD 
+};
 
 const login = (req, res) => {
   const { username, password } = req.body;
