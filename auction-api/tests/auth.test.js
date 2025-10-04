@@ -15,11 +15,15 @@ describe("Auth Controller - login", () => {
       json: jest.fn(),
     };
     jest.clearAllMocks();
-    process.env.JWT_SECRET = "testsecret"; // Mock JWT secret
+
+    // Mock environment variables
+    process.env.JWT_SECRET = "testsecret";
+    process.env.ADMIN_USERNAME = "Admin";
+    process.env.ADMIN_PASSWORD = "Admin";
   });
 
   it("should return token for valid credentials", () => {
-    const req = { body: { username: "Admin", password: "Admin" } };
+    const req = { body: { username: process.env.ADMIN_USERNAME.username, password: process.env.ADMIN_PASSWORD.password } };
     const fakeToken = "fake.jwt.token";
 
     jwt.sign.mockReturnValue(fakeToken);
@@ -27,14 +31,18 @@ describe("Auth Controller - login", () => {
 
     login(req, res);
 
-    expect(jwt.sign).toHaveBeenCalledWith({ username: "Admin" }, "testsecret", { expiresIn: "1h" });
+    expect(jwt.sign).toHaveBeenCalledWith(
+      { username: process.env.ADMIN_USERNAME.username },
+      "testsecret",
+      { expiresIn: "1h" }
+    );
     expect(ApiResponse.Ok).toHaveBeenCalledWith({ token: fakeToken }, res);
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith({ token: fakeToken });
   });
 
   it("should return unauthorized for invalid username", () => {
-    const req = { body: { username: "Wrong", password: "Admin" } };
+    const req = { body: { username: "Wrong", password: process.env.ADMIN_PASSWORD.password } };
     ApiResponse.unAuthorized.mockImplementation((res, message) => res.status(401).json({ message }));
 
     login(req, res);
@@ -45,7 +53,7 @@ describe("Auth Controller - login", () => {
   });
 
   it("should return unauthorized for invalid password", () => {
-    const req = { body: { username: "Admin", password: "Wrong" } };
+    const req = { body: { username: process.env.ADMIN_USERNAME.username, password: "Wrong" } };
     ApiResponse.unAuthorized.mockImplementation((res, message) => res.status(401).json({ message }));
 
     login(req, res);
@@ -55,3 +63,4 @@ describe("Auth Controller - login", () => {
     expect(res.json).toHaveBeenCalledWith({ message: messages.ERRORS.InvalidCredentials });
   });
 });
+

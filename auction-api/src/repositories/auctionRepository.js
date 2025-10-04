@@ -45,6 +45,14 @@ class AuctionRepository {
       .populate("dealer", "name email")
       .exec();
   }
+
+  async endAuction(auctionId) {
+    return await Auction.findByIdAndUpdate(
+      auctionId,
+      { status: "ended" },
+      { new: true }
+    );
+  }
 }
 
 module.exports = new AuctionRepository();

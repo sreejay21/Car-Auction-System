@@ -81,6 +81,10 @@ const getWinnerBid = async (req, res) => {
     const winner = await repo.getWinnerBid(req.params.auctionId);
     if (!winner) return ApiResponse.notFound(res, messages.ERRORS.NoBids);
 
+    const updatedAuction = await repo.endAuction(req.params.auctionId);
+    if (!updatedAuction)
+      return ApiResponse.notFound(res, messages.ERRORS.AuctionNotFound);
+
     const responseWinner = {
       bidId: winner._id,
       auctionId: winner.auction,
@@ -90,6 +94,7 @@ const getWinnerBid = async (req, res) => {
       bidAmount: winner.bidAmount,
       previousBid: winner.previousBid,
       createdAt: winner.createdAt,
+      auctionStatus: updatedAuction.status,
     };
 
     return ApiResponse.Ok(responseWinner, res);
