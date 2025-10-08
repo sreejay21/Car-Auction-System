@@ -3,48 +3,82 @@ const Bid = require("../models/BidModel");
 
 class AuctionRepository {
   async createAuction(data) {
-    const auction = new Auction(data);
-    return auction.save();
+    try {
+      const auction = new Auction(data);
+      return await auction.save();
+    } catch (error) {
+      console.error("Error creating auction:", error);
+      throw new Error("Failed to create auction");
+    }
   }
 
   async startAuction(auctionId) {
-    return Auction.findByIdAndUpdate(
-      auctionId,
-      { status: "active" },
-      { new: true }
-    );
+    try {
+      const auction = await Auction.findByIdAndUpdate(
+        auctionId,
+        { status: "active" },
+        { new: true }
+      );
+      return auction;
+    } catch (error) {
+      console.error("Error starting auction:", error);
+      throw new Error("Failed to start auction");
+    }
   }
 
   async placeBid(auctionId, { dealerId, bidAmount }) {
-    const lastBid = await Bid.findOne({ auction: auctionId }).sort({ createdAt: -1 });
+    try {
+      const lastBid = await Bid.findOne({ auction: auctionId }).sort({ createdAt: -1 });
 
-    const bid = new Bid({
-      auction: auctionId,
-      dealer: dealerId,
-      bidAmount,
-      previousBid: lastBid ? lastBid.bidAmount : 0,
-    });
+      const bid = new Bid({
+        auction: auctionId,
+        dealer: dealerId,
+        bidAmount,
+        previousBid: lastBid ? lastBid.bidAmount : 0,
+      });
 
-    return bid.save();
+      return await bid.save();
+    } catch (error) {
+      console.error("Error placing bid:", error);
+      throw new Error("Failed to place bid");
+    }
   }
 
   async getWinnerBid(auctionId) {
-    return Bid.findOne({ auction: auctionId })
-      .sort({ bidAmount: -1 })
-      .populate("dealer", "name email")
-      .exec();
+    try {
+      const winnerBid = await Bid.findOne({ auction: auctionId })
+        .sort({ bidAmount: -1 })
+        .populate("dealer", "name email")
+        .exec();
+      return winnerBid;
+    } catch (error) {
+      console.error("Error getting winner bid:", error);
+      throw new Error("Failed to get winner bid");
+    }
   }
 
   async endAuction(auctionId) {
-    return await Auction.findByIdAndUpdate(
-      auctionId,
-      { status: "ended" },
-      { new: true }
-    );
+    try {
+      const auction = await Auction.findByIdAndUpdate(
+        auctionId,
+        { status: "ended" },
+        { new: true }
+      );
+      return auction;
+    } catch (error) {
+      console.error("Error ending auction:", error);
+      throw new Error("Failed to end auction");
+    }
   }
 
   async getAuctionById(auctionId) {
-    return Auction.findById(auctionId);
+    try {
+      const auction = await Auction.findById(auctionId);
+      return auction;
+    } catch (error) {
+      console.error("Error fetching auction by ID:", error);
+      throw new Error("Failed to get auction by ID");
+    }
   }
 }
 

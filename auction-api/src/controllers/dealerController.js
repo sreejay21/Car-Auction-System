@@ -6,9 +6,17 @@ const messages = require("../constants/messages");
 const createDealer = async (req, res) => {
   try {
     const errors = validationResult(req);
-    if (!errors.isEmpty())
+    if (!errors.isEmpty()) {
       return ApiResponse.getValidationError(res, errors.array());
+    }
 
+    // Check if dealer with email already exists
+    const existingDealer = await dealerRepo.findDealerByEmail(req.body.email);
+    if (existingDealer) {
+      return ApiResponse.badRequest(res, messages.ERRORS.DealerExists);
+    }
+
+    // Create dealer
     const dealer = await dealerRepo.createDealer(req.body);
 
     // Map _id to dealerId in response
