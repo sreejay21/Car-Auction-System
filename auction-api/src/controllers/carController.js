@@ -1,5 +1,5 @@
 const { validationResult } = require("express-validator");
-const carRepo = require("../repositories/carRepository");
+const carRepository = require("../repositories/carRepository");
 const ApiResponse = require("../utils/apiResponse");
 
 const createCar = async (req, res) => {
@@ -7,7 +7,7 @@ const createCar = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return ApiResponse.getValidationError(res, errors.array());
 
-    const car = await carRepo.createCar(req.body);
+    const car = await carRepository.createCar(req.body);
 
     // Map _id to carId before sending response
     const responseCar = {

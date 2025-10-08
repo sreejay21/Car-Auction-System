@@ -1,5 +1,7 @@
 const { validationResult } = require("express-validator");
-const repo = require("../repositories/auctionRepository");
+const AuctionRepository = require("../repositories/auctionRepository");
+const DealerRepository = require("../repositories/dealerRepository");
+const carRepository = require("../repositories/carRepository");
 const ApiResponse = require("../utils/apiResponse");
 const messages = require("../constants/messages");
 
@@ -9,7 +11,9 @@ const createAuction = async (req, res) => {
     if (!errors.isEmpty())
       return ApiResponse.getValidationError(res, errors.array());
 
-    const auction = await repo.createAuction(req.body);
+    const auction = await AuctionRepository.createAuction(req.body);
+    const car = await carRepository.getCarById(req.body.car);
+    if (!car) return ApiResponse.notFound(res, messages.ERRORS.CarNotFound);
 
     const responseAuction = {
       auctionId: auction._id,
@@ -31,7 +35,7 @@ const createAuction = async (req, res) => {
 
 const startAuction = async (req, res) => {
   try {
-    const auction = await repo.startAuction(req.params.auctionId);
+    const auction = await AuctionRepository.startAuction(req.params.auctionId);
     if (!auction) return ApiResponse.notFound(res, messages.ERRORS.AuctionNotFound);
 
     const responseAuction = {
@@ -56,7 +60,13 @@ const placeBid = async (req, res) => {
       return ApiResponse.getValidationError(res, errors.array());
 
     const { auctionId, dealerId, bidAmount } = req.body;
-    const bid = await repo.placeBid(auctionId, { dealerId, bidAmount });
+    const auction = await AuctionRepository.getAuctionById(auctionId);
+    if (!auction) return ApiResponse.notFound(res, messages.ERRORS.AuctionNotFound);
+    
+    const dealer = await DealerRepository.getDealerById(dealerId);
+    if (!dealer) return ApiResponse.notFound(res, messages.ERRORS.DealerNotFound);
+
+    const bid = await AuctionRepository.placeBid(auctionId, { dealerId, bidAmount });
 
     const responseBid = {
       bidId: bid._id,
@@ -78,10 +88,10 @@ const placeBid = async (req, res) => {
 
 const getWinnerBid = async (req, res) => {
   try {
-    const winner = await repo.getWinnerBid(req.params.auctionId);
+    const winner = await AuctionRepository.getWinnerBid(req.params.auctionId);
     if (!winner) return ApiResponse.notFound(res, messages.ERRORS.NoBids);
 
-    const updatedAuction = await repo.endAuction(req.params.auctionId);
+    const updatedAuction = await AuctionRepository.endAuction(req.params.auctionId);
     if (!updatedAuction)
       return ApiResponse.notFound(res, messages.ERRORS.AuctionNotFound);
 
