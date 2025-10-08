@@ -33,7 +33,7 @@ class AuctionRepository {
       auction: auctionId,
       dealer: dealerId,
       bidAmount,
-      previousBid: lastBid ? lastBid.bidAmount : null,
+      previousBid: lastBid ? lastBid.bidAmount : 0,
     });
 
     return bid.save();

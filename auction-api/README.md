@@ -99,7 +99,7 @@ A **Node.js + Express + MongoDB (Atlas)** based REST API for managing auctions o
 
 ### Car Endpoints
 1. **Create Car**  
-     **POST** `/api/v1/car/createCar`  
+     **POST** `/api/v1/cars/create`  
      **Headers**:  
      `Authorization: Bearer <JWT_TOKEN>`  
      **Body**:
@@ -130,7 +130,7 @@ A **Node.js + Express + MongoDB (Atlas)** based REST API for managing auctions o
 
 ### Dealer Endpoints
 1. **Create Dealer**  
-     **POST** `/api/v1/dealer`  
+     **POST** `api/v1/dealer/createDealer`  
      **Headers**:  
      `Authorization: Bearer <JWT_TOKEN>`  
      **Body**:
@@ -138,8 +138,6 @@ A **Node.js + Express + MongoDB (Atlas)** based REST API for managing auctions o
      {
          "name": "Dealer Name",
          "email": "dealer@example.com",
-         "username": "dealer1",
-         "password": "dealerPass"
      }
      ```
      **Response**:
